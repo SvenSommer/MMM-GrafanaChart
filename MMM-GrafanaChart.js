@@ -20,17 +20,32 @@ Module.register("MMM-GrafanaChart", {
         Log.info("Starting module: " + this.name);
         this.scheduleUpdate();
     },
+
+    buildUrl: function() {
+        var URL = "";
+        URL += this.config.protocol + "://";
+        URL += this.config.host + ":" + this.config.port;
+        if (this.config.version == "6") {
+            URL += "/d/" + this.config.id;
+        } else{
+            URL += "/dashboard-solo/db";
+        }
+        URL += "/" + this.config.dashboardname;
+        URL += "?orgId=" + this.config.orgId;
+        URL += "&panelId=" + this.config.panelId;
+        if (this.config.version == "6") {
+            URL += "&fullscreen&kiosk";
+        }
+        return URL;
+    },
+
     // Override dom generator.
     getDom: function() {
         var iframe = document.createElement("IFRAME");
         iframe.style = "border:0"
         iframe.width = this.config.width;
         iframe.height = this.config.height;
-        if (this.config.version == "6") {
-            iframe.src =  this.config.protocol + "://" +  this.config.host + ":" + this.config.port + "/d/" + this.config.id + "/" + this.config.dashboardname +  "?orgId=" + this.config.orgId + "&panelId=" + this.config.panelId + "&fullscreen&kiosk";
-        } else{
-            iframe.src =  this.config.protocol + "://" +  this.config.host + ":" + this.config.port + "/dashboard-solo/db/" + this.config.dashboardname+  "?orgId=" + this.config.orgId + "&panelId=" + this.config.panelId;;
-        }
+        iframe.src = this.buildUrl();
         iframe.setAttribute("timestamp", new Date().getTime());
         iframe.setAttribute("scrolling", "no");
         return iframe;
