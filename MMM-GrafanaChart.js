@@ -9,6 +9,7 @@
 Module.register("MMM-GrafanaChart", {
     // Default module config.
     defaults: {
+        protocol: "http",
         height:"100%",
         width:"100%",
         refreshInterval: 900
@@ -26,9 +27,9 @@ Module.register("MMM-GrafanaChart", {
         iframe.width = this.config.width;
         iframe.height = this.config.height;
         if (this.config.version == "6") {
-            iframe.src =  "http://" +  this.config.host + ":" + this.config.port + "/d/" + this.config.id + "/" + this.config.dashboardname +  "?orgId=" + this.config.orgId + "&panelId=" + this.config.panelId + "&fullscreen&kiosk";
+            iframe.src =  this.config.protocol + "://" +  this.config.host + ":" + this.config.port + "/d/" + this.config.id + "/" + this.config.dashboardname +  "?orgId=" + this.config.orgId + "&panelId=" + this.config.panelId + "&fullscreen&kiosk";
         } else{
-            iframe.src =  "http://" +  this.config.host + ":" + this.config.port + "/dashboard-solo/db/" + this.config.dashboardname+  "?orgId=" + this.config.orgId + "&panelId=" + this.config.panelId;;
+            iframe.src =  this.config.protocol + "://" +  this.config.host + ":" + this.config.port + "/dashboard-solo/db/" + this.config.dashboardname+  "?orgId=" + this.config.orgId + "&panelId=" + this.config.panelId;;
         }
         iframe.setAttribute("timestamp", new Date().getTime());
         return iframe;
