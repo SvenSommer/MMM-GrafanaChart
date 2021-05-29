@@ -48,11 +48,6 @@ Module.register("MMM-GrafanaChart", {
             Log.error("Tried to refresh, iFrameReload URL not set!");
             return;
         }
-        if (this.config.version == "6") {
-            this.src = "http://" +  this.config.host + ":" + this.config.port + "/d/" + this.config.id + "/" + this.config.dashboardname +  "?orgId=" + this.config.orgId + "&panelId=" + this.config.panelId + "&fullscreen&kiosk";
-        } else{
-            this.src = "http://" +  this.config.host + ":" + this.config.port + "/dashboard-solo/db/" + this.config.dashboardname+  "?orgId=" + this.config.orgId + "&panelId=" + this.config.panelId;
-        }
         Log.info("attempting to update dom for iFrameReload");
         Log.info('/"this/" module is: ' + this);
         this.updateDom(1000);
