@@ -9,7 +9,7 @@
 Module.register("MMM-GrafanaChart", {
     // Default module config.
     defaults: {
-        protocol: "http",
+        url: "invalid",
         height:"100%",
         width:"100%",
         refreshInterval: 900
@@ -21,31 +21,17 @@ Module.register("MMM-GrafanaChart", {
         this.scheduleUpdate();
     },
 
-    buildUrl: function() {
-        var URL = "";
-        URL += this.config.protocol + "://";
-        URL += this.config.host + ":" + this.config.port;
-        if (this.config.version == "6") {
-            URL += "/d/" + this.config.id;
-        } else{
-            URL += "/dashboard-solo/db";
-        }
-        URL += "/" + this.config.dashboardname;
-        URL += "?orgId=" + this.config.orgId;
-        URL += "&panelId=" + this.config.panelId;
-        if (this.config.version == "6") {
-            URL += "&fullscreen&kiosk";
-        }
-        return URL;
-    },
-
     // Override dom generator.
     getDom: function() {
+        if( ! this.config.url.match(/^https?:/i) ){
+            return document.createTextNode(this.name+" found no usable URL configured. Please check your config!");
+        }
+
         var iframe = document.createElement("IFRAME");
         iframe.style = "border:0"
         iframe.width = this.config.width;
         iframe.height = this.config.height;
-        iframe.src = this.buildUrl();
+        iframe.src = this.config.url;
         // this attribute is used to ensure MagicMirror doesn't throw away our updateDom(), because the DOM object is identical to the previous one
         iframe.setAttribute("timestamp", new Date().getTime());
         iframe.setAttribute("scrolling", "no");
