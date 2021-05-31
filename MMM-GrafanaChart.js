@@ -9,6 +9,7 @@
 Module.register("MMM-GrafanaChart", {
     // Default module config.
     defaults: {
+        url: "invalid",
         height:"100%",
         width:"100%",
         refreshInterval: 900
@@ -17,49 +18,34 @@ Module.register("MMM-GrafanaChart", {
     // Define start sequence.
     start: function() {
         Log.info("Starting module: " + this.name);
-        this.scheduleUpdate(this.config.refreshInterval);
+        this.scheduleUpdate();
     },
+
     // Override dom generator.
     getDom: function() {
+        if( ! this.config.url.match(/^https?:/i) ){
+            return document.createTextNode(this.name+" found no usable URL configured. Please check your config!");
+        }
+
         var iframe = document.createElement("IFRAME");
         iframe.style = "border:0"
         iframe.width = this.config.width;
         iframe.height = this.config.height;
-		if (this.config.version == "6")
-		{
-        iframe.src =  "http://" +  this.config.host + ":" + this.config.port + "/d/" + this.config.id + "/" + this.config.dashboardname +  "?orgId=" + this.config.orgId + "&panelId=" + this.config.panelId + "&fullscreen&kiosk";
-		}
-		else{
-			        iframe.src =  "http://" +  this.config.host + ":" + this.config.port + "/dashboard-solo/db/" + this.config.dashboardname+  "?orgId=" + this.config.orgId + "&panelId=" + this.config.panelId;;
-			}
+        iframe.src = this.config.url;
+        // this attribute is used to ensure MagicMirror doesn't throw away our updateDom(), because the DOM object is identical to the previous one
         iframe.setAttribute("timestamp", new Date().getTime());
+        iframe.setAttribute("scrolling", "no");
         return iframe;
     },
-    scheduleUpdate: function(delay) {
-        var nextLoad = this.config.refreshInterval;
-        if (typeof delay !== "undefined" && delay >= 0) {
-            nextLoad = delay * 1000; // Convert seconds to millis
-        }
+    scheduleUpdate: function() {
         var self = this;
         setTimeout(function() {
             self.updateFrame();
-        }, nextLoad);
+        }, this.config.refreshInterval*1000);
     },
     updateFrame: function() {
-        if (this.config.url === "") {
-            Log.error("Tried to refresh, iFrameReload URL not set!");
-            return;
-        }
-			if (this.config.version == "6")
-		{
-        this.src = "http://" +  this.config.host + ":" + this.config.port + "/d/" + this.config.id + "/" + this.config.dashboardname +  "?orgId=" + this.config.orgId + "&panelId=" + this.config.panelId + "&fullscreen&kiosk";
-		}
-		else{
-		this.src = "http://" +  this.config.host + ":" + this.config.port + "/dashboard-solo/db/" + this.config.dashboardname+  "?orgId=" + this.config.orgId + "&panelId=" + this.config.panelId;
-		}
         Log.info("attempting to update dom for iFrameReload");
-        Log.info('/"this/" module is: ' + this);
         this.updateDom(1000);
-        this.scheduleUpdate(this.config.refreshInterval);
+        this.scheduleUpdate();
     }
 });
